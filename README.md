@@ -20,6 +20,15 @@ This repository is divided to branches that correspond to the blog post sections
 * components-part2 - The code at the end of the Components-Phase 2 section.
 * websockets-part2 - The code at the end of the WebSockets-Phase 2 section.
 
-## Refleksi
+
+## Refleksi Adpro
+Link github Simple WebSocket Server: https://github.com/jtordgeman/SimpleWebsocketServer
+
 Screenshot menjalankan YewChat
 ![alt text](image.png)
+
+
+Creativity:
+![alt text](image-1.png)
+- Menggunakan Open-source API https://www.dicebear.com/ untuk meng-generate avatar dengan seed berupa username.
+- Membuat fitur command `/img` yang akan menggenerate gambar secara random

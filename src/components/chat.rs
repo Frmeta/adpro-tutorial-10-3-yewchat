@@ -5,6 +5,7 @@ use yew_agent::{Bridge, Bridged};
 
 use crate::{User, services::websocket::WebsocketService};
 use crate::services::event_bus::EventBus;
+use rand::Rng;
 
 pub enum Msg {
     HandleMsg(String),
@@ -93,7 +94,7 @@ impl Component for Chat {
                             .map(|u| UserProfile {
                                 name: u.into(),
                                 avatar: format!(
-                                    "https://avatars.dicebear.com/api/adventurer-neutral/{}.svg",
+                                    "https://api.dicebear.com/8.x/open-peeps/svg?seed={}",
                                     u
                                 )
                                 .into(),
@@ -104,6 +105,27 @@ impl Component for Chat {
                     MsgTypes::Message => {
                         let message_data: MessageData =
                             serde_json::from_str(&msg.data.unwrap()).unwrap();
+
+                        let mut rng = rand::thread_rng();
+                        let seed: u32 = rng.gen();
+
+                        // make comand /img that will show random image
+                        if message_data.message == "/img" {
+                            let message = WebSocketMessage {
+                                message_type: MsgTypes::Message,
+                                data: Some(format!("https://picsum.photos/seed/{}/50", seed).into()),
+                                data_array: None,
+                            };
+                            if let Err(e) = self
+                                .wss
+                                .tx
+                                .clone()
+                                .try_send(serde_json::to_string(&message).unwrap())
+                            {
+                                log::debug!("error sending to channel: {:?}", e);
+                            }
+                            return true;
+                        }
                         self.messages.push(message_data);
                         return true;
                     }
@@ -176,8 +198,8 @@ impl Component for Chat {
                                                 {m.from.clone()}
                                             </div>
                                             <div class="text-xs text-gray-500">
-                                                if m.message.ends_with(".gif") {
-                                                    <img class="mt-3" src={m.message.clone()}/>
+                                                if m.message.starts_with("https://") {
+                                                    <img class="mt-3" src={m.message.clone()} width="300px" />
                                                 } else {
                                                     {m.message.clone()}
                                                 }
